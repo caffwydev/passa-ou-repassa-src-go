@@ -859,7 +859,6 @@ function AnswerQuestion(number) {
         setSubtext();
         setTimeout(() => {
           if (gameSettings.autoplay) {
-
             restore();
             askQuestion();
           } else {
@@ -910,7 +909,6 @@ function AnswerQuestion(number) {
         setSubtext();
         setTimeout(() => {
           if (gameSettings.autoplay) {
-
             restore();
             askQuestion();
           } else {
@@ -957,32 +955,33 @@ winModal = () => {
 
   setSubtext();
   setTimeout(() => {
-    startTyping("O vencedor é...");
-    if (settings.semPlacar) {
-      return startTyping("O placar foi desativado.");
-    }
-    const ShowWinner = () => {
-      ShowScore();
-      if (Scoreboard.Blue > Scoreboard.Red) {
-        startTyping(gameSettings.name1 || "Unknown");
-        document.getElementById("crown").classList.remove("hidden");
-        setSubtext("Parabéns!");
-        shotconfetti();
-        win.play();
-      } else if (Scoreboard.Red > Scoreboard.Blue) {
-        startTyping(gameSettings.name2 || "Unknown");
-        document.getElementById("crown").classList.remove("hidden");
-        setSubtext("Parabéns!");
-        shotconfetti();
-        win.play();
-      } else {
-        startTyping("Empate!");
-        setSubtext("Whoops!");
+    startTyping("O vencedor é...").then(() => {
+      if (settings.semPlacar) {
+        return startTyping("O placar foi desativado.");
       }
-      suspense.removeEventListener("ended", ShowWinner);
-    };
+      const ShowWinner = () => {
+        ShowScore();
+        if (Scoreboard.Blue > Scoreboard.Red) {
+          startTyping(gameSettings.name1 || "Unknown");
+          document.getElementById("crown").classList.remove("hidden");
+          setSubtext("Parabéns!");
+          shotconfetti();
+          win.play();
+        } else if (Scoreboard.Red > Scoreboard.Blue) {
+          startTyping(gameSettings.name2 || "Unknown");
+          document.getElementById("crown").classList.remove("hidden");
+          setSubtext("Parabéns!");
+          shotconfetti();
+          win.play();
+        } else {
+          startTyping("Empate!");
+          setSubtext("Whoops!");
+        }
+        suspense.removeEventListener("ended", ShowWinner);
+      };
 
-    suspense.addEventListener("ended", ShowWinner);
-    suspense.play();
+      suspense.addEventListener("ended", ShowWinner);
+      suspense.play();
+    });
   }, 1500);
 };
