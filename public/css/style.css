@@ -111,7 +111,6 @@ body {
 }
 /* Aplicar isso ao elemento de texto */
 .typing {
-  overflow: hidden;
   width: 100%;
   opacity: 1;
 }
