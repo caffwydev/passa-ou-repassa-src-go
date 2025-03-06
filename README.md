@@ -1,11 +1,12 @@
-# 🎮 PASSA OU REPASSA 🎮
+# 🎮 PASSA OU REPASSA (GOLANG) 🎮
 
 Um minigame desenvolvido para o 8° ano do IEPAM em 2024, em parceria com o professor Thiago de Matemática. 🏫📚
-Atualizado em Março de 2025 para abandonar o Node.js e utilizar golang. 
+Atualizado em Março de 2025 para abandonar o Node.js e utilizar Golang. Aplicação leve.
+
 
 ---
 
-## ⚡ Projeto feito com Thunderbolt (Scanner de Arduino)
+** ⚡ Projeto feito com tecnologia THUNDERBOLT(Scanner de Serial Personalizado) **
 
 ---
 
