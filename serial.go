@@ -132,19 +132,19 @@ type ArduinoScanner struct {
 func NewArduinoScanner() *ArduinoScanner {
 	return &ArduinoScanner{
 		vendorIDs: map[string]bool{
-			"2341": true, // Arduino LLC (Arduino Uno, Mega, Nano, etc.)
-			"1a86": true, // CH340 (clones de Arduino e STM32)
-			"0403": true, // FTDI (FT232, FT231X - usado em muitos adaptadores)
-			"10c4": true, // CP210x (Silicon Labs - usado em ESP32, ESP8266)
-			"2e8a": true, // Raspberry Pi (Pico - RP2040)
-			"16c0": true, // Teensy (PJRC)
-			"1b4f": true, // SparkFun (Pro Micro)
-			"239a": true, // Adafruit (Feather)
-			"0483": true, // STMicroelectronics (STM32 - Blue Pill, Black Pill)
-			"03eb": true, // Atmel (AVR - microcontroladores antigos)
-			"04d8": true, // Microchip (PIC - alguns modelos com USB)
-			"04b4": true, // Cypress (FX2 - usado em alguns programadores)
-			"1366": true, // SEGGER (J-Link - programadores/debuggers)
+			"2341": true,
+			"1a86": true,
+			"0403": true,
+			"10c4": true,
+			"2e8a": true,
+			"16c0": true,
+			"1b4f": true,
+			"239a": true,
+			"0483": true,
+			"03eb": true,
+			"04d8": true,
+			"04b4": true,
+			"1366": true,
 		},
 	}
 }
