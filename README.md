@@ -7,7 +7,7 @@ Atualizado em Março de 2025 para abandonar o Node.js e utilizar Golang. Aplica�
 
 ---
 
-- ** ⚡ Projeto feito com tecnologia THUNDERBOLT(Scanner de Serial Personalizado) **
+- **⚡ Projeto feito com tecnologia THUNDERBOLT(Scanner de Serial Personalizado)**
 
 ---
 
