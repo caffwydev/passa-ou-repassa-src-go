@@ -12,9 +12,11 @@ import (
 type ArduinoPairer struct {
 	scanner     *ArduinoScanner
 	currentPort serial.Port
-	portAddress string // Novo campo para armazenar o endereço
+	portAddress string
 	connected   bool
 }
+
+var lastPing = time.Now()
 
 func NewArduinoPairer() *ArduinoPairer {
 	return &ArduinoPairer{
@@ -94,7 +96,9 @@ func (p *ArduinoPairer) readMessages() {
 		msg := strings.TrimSpace(message)
 		switch {
 		case msg == "PO":
+			lastPing = time.Now()
 		case msg == "O":
+			lastPing = time.Now()
 		default:
 			EmitAll("button", msg)
 			sendLog("info", "Botão pressionado: "+msg)
@@ -115,7 +119,7 @@ func (p *ArduinoPairer) disconnect() {
 func (p *ArduinoPairer) monitorConnection() {
 	for p.connected {
 		time.Sleep(100 * time.Millisecond)
-		if !p.scanner.IsConnected(p.portAddress) {
+		if time.Since(lastPing) > time.Second*5 {
 			p.disconnect()
 		}
 	}
@@ -128,9 +132,19 @@ type ArduinoScanner struct {
 func NewArduinoScanner() *ArduinoScanner {
 	return &ArduinoScanner{
 		vendorIDs: map[string]bool{
-			"2341": true,
-			"1A86": true,
-			"2A03": true,
+			"2341": true, // Arduino LLC (Arduino Uno, Mega, Nano, etc.)
+			"1a86": true, // CH340 (clones de Arduino e STM32)
+			"0403": true, // FTDI (FT232, FT231X - usado em muitos adaptadores)
+			"10c4": true, // CP210x (Silicon Labs - usado em ESP32, ESP8266)
+			"2e8a": true, // Raspberry Pi (Pico - RP2040)
+			"16c0": true, // Teensy (PJRC)
+			"1b4f": true, // SparkFun (Pro Micro)
+			"239a": true, // Adafruit (Feather)
+			"0483": true, // STMicroelectronics (STM32 - Blue Pill, Black Pill)
+			"03eb": true, // Atmel (AVR - microcontroladores antigos)
+			"04d8": true, // Microchip (PIC - alguns modelos com USB)
+			"04b4": true, // Cypress (FX2 - usado em alguns programadores)
+			"1366": true, // SEGGER (J-Link - programadores/debuggers)
 		},
 	}
 }
@@ -149,20 +163,21 @@ func (s *ArduinoScanner) Scan() ([]string, error) {
 		}
 		defer port.Close()
 
-		vid, _ := getPortIdentifiers(portName)
+		vid := getPortIdentifiers(portName)
 		if s.vendorIDs[vid] {
-			validPorts = append(validPorts, portName) // Retornar o nome/endereço da porta
+			validPorts = append(validPorts, portName)
 		}
 	}
 
 	return validPorts, nil
 }
-func (s *ArduinoScanner) IsConnected(port string) bool {
-	// Implementação da verificação de porta ativa
-	return true
-}
 
-func getPortIdentifiers(port string) (string, string) {
-	// Implementação específica do sistema operacional
-	return "2341", "0043"
+func getPortIdentifiers(port string) string {
+	portVendor, err := GetVendorID(port)
+	if err != nil {
+		return ""
+	}
+	finalVendor := VendorIDToString(portVendor)
+
+	return finalVendor
 }
