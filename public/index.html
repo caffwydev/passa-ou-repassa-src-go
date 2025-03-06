@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Passa ou Repassa</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="scripts/socket.js"></script>
+    <script src="scripts/tailwind.js"></script>
+    <script src="scripts/sweetalert.js"></script>
+    <script src="scripts/confetti.min.js"></script>
+    <link href="icons/css/fontawesome.css" rel="stylesheet" />
+    <link href="icons/css/brands.css" rel="stylesheet" />
+    <link href="icons/css/solid.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="app" id="game">
+      <div class="scoreboard">
+        <div class="team blue">
+          <div>
+            <h2 class="team_marker" id="team1_marker">Time Azul</h2>
+            <span id="blue-score">0</span>
+          </div>
+        </div>
+        <div class="question flex flex-col w-full bg-purple-700">
+
+          <div class="wrapper cross-mark hidden mb-2">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark_circle" cx="26" cy="26" r="25" fill="none"/><path class="checkmark_check" fill="none" d="M14.1 14.1l23.8 23.8 m0,-23.8 l-23.8,23.8"/></svg>
+            </div>
+          <div class="success-checkmark hidden mb-2">
+            <div class="check-icon">
+              <span class="icon-line line-tip"></span>
+              <span class="icon-line line-long"></span>
+              <div class="icon-circle"></div>
+              <div class="icon-fix"></div>
+            </div>
+          </div>
+          <img class="hidden" id="crown" src="/img/crown.png" width="128" height="128">
+          <h1 class="hid typing" id="question-text">Back-end Offline!</h1>
+          <h1 class="hid" id="question-subtext"></h1>
+          <div
+            class="text-white hidden justify-center items-center mt-5 rounded"
+            id="alternatives"
+          >
+            <div class="grid grid-cols-2 gap-5 p-5">
+              <div class="bg-purple-700 p-4 rounded text-base alt-1">
+                <div
+                  class="inline-flex items-center justify-center w-8 h-8 text-xs font-bold text-white bg-purple-800 mb-2 border-white rounded-full"
+                >
+                  1
+                </div>
+                <br />
+                <span id="alternative-1"></span>
+              </div>
+              <div class="bg-purple-700 p-4 rounded text-base alt-2">
+                <div
+                  class="inline-flex items-center justify-center w-8 h-8 text-xs font-bold text-white bg-purple-800 mb-2 border-white rounded-full"
+                >
+                  2
+                </div>
+                <br />
+                <span id="alternative-2"></span>
+              </div>
+              <div class="bg-purple-700 p-4 rounded text-base alt-3">
+                <div
+                  class="inline-flex items-center justify-center w-8 h-8 text-xs font-bold text-white bg-purple-800 mb-2 border-white rounded-full"
+                >
+                  3
+                </div>
+                <br /><span id="alternative-3"></span>
+              </div>
+              <div class="bg-purple-700 p-4 rounded text-base alt-4">
+                <div
+                  class="inline-flex items-center justify-center w-8 h-8 text-xs font-bold text-white bg-purple-800 mb-2 border-white rounded-full"
+                >
+                  4
+                </div>
+                <br />
+                <span id="alternative-4"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="team red">
+          <div>
+            <h2 class="team_marker" id="team2_marker">Time Vermelho</h2>
+            <span id="red-score">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="bottom-0 absolute w-full bg-neutral-800 text-white p-1 text-center"
+    >
+      Feito por<i class="ml-2 mr-1 fa-brands fa-github"></i>caffwydev - Status:
+      <span class="text-red-600" id="app-status">Desconectado</span> (<span id="counter1">0</span>/<span id="counter2">0</span>) - Pressione
+      <span class="text-green-500 cursor-pointer" onclick="openHelp()">H</span> para abrir a ajuda - Uso
+      <span class="text-green-600">público</span> (código aberto)
+    </div>
+  </body>
+  <script src="scripts/script.js"></script>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construtor de Questionários</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --primary: #7c3aed;
+            --secondary: #4f46e5;
+            --text: #333333;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border: #e0e0e0;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text: #e0e0e0;
+            --border: #404040;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .question-block {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .question-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+            padding: 0.4rem 0.8rem;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text);
+            margin-bottom: 1rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .option-item {
+            position: relative;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .option-item input {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text);
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .correct-marker {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--success);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .correct-check:checked + .option-item {
+            border: 2px solid var(--success);
+        }
+
+        .correct-check:checked + .option-item .correct-marker {
+            display: flex;
+        }
+
+        .correct-check {
+            display: none;
+        }
+
+        #questionnaire-title {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .drag-handle {
+            cursor: move;
+            opacity: 0.6;
+            padding: 0.5rem;
+        }
+
+        .drag-handle:hover {
+            opacity: 1;
+        }
+
+        .mode-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Construtor de Questionário</h1>
+            <input type="text" id="questionnaire-title" placeholder="Digite o título do questionário">
+        </div>
+
+        <div class="controls">
+            <button class="btn-primary" onclick="addQuestion()">
+                <span>➕</span> Nova Pergunta
+            </button>
+            <button class="btn-primary" onclick="generateQN()">
+                <span>📤</span> Exportar
+            </button>
+            <button class="btn-secondary" onclick="loadAdvancedExample()">
+                <span>🔄</span> Carregar Exemplo
+            </button>
+            <button class="btn-secondary" onclick="importQN()">
+                <span>📥</span> Importar
+            </button>
+            <button class="btn-secondary" onclick="window.location.href = '/'">
+                <span>🔙</span> Voltar
+            </button>
+        </div>
+
+        <div id="questions-container"></div>
+    </div>
+
+    <button class="mode-toggle" onclick="toggleDarkMode()">🌙</button>
+
+    <script>
+        let questionCount = 0;
+
+        function createQuestionBlock() {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.innerHTML = `
+                <div class="question-header">
+                    <div class="question-title">Questão</div>
+                    <button class="delete-btn" onclick="this.parentElement.parentElement.remove()">🗑️</button>
+                </div>
+                <textarea placeholder="Digite a pergunta"></textarea>
+                <div class="options-grid">
+                    ${Array.from({length: 4}, () => `
+                    <label>
+                        <input type="radio" name="question${questionCount}" class="correct-check" 
+                               onclick="toggleCorrect(this)">
+                        <div class="option-item">
+                            <div class="correct-marker">✓</div>
+                            <input type="text" class="option-input" placeholder="Opção">
+                        </div>
+                    </label>
+                    `).join('')}
+                </div>
+            `;
+            questionCount++;
+            return block;
+        }
+
+        function addQuestion() {
+            const container = document.getElementById('questions-container');
+            container.appendChild(createQuestionBlock());
+        }
+
+        function toggleCorrect(radio) {
+            const options = radio.closest('.options-grid').querySelectorAll('.correct-check');
+            options.forEach(opt => opt.checked = false);
+            radio.checked = true;
+        }
+
+        function generateQN() {
+            const title = document.getElementById('questionnaire-title').value.trim();
+            if (!title) {
+                alert('Digite um título para o questionário!');
+                return;
+            }
+
+            let qnContent = `# ${title}\n`;
+            
+            document.querySelectorAll('.question-block').forEach(block => {
+                const question = block.querySelector('textarea').value.trim();
+                const options = Array.from(block.querySelectorAll('.option-input')).map(input => {
+                    const isCorrect = input.closest('label').querySelector('.correct-check').checked;
+                    return isCorrect ? `*${input.value.trim()}` : input.value.trim();
+                });
+
+                if (question && options.every(opt => opt)) {
+                    qnContent += `${question} % ${options.join(' % ')}\n`;
+                }
+            });
+
+            const blob = new Blob([qnContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${title.replace(/[^a-z0-9]/gi, '_')}.qn`;
+            link.click();
+        }
+
+        function loadAdvancedExample() {
+            document.getElementById('questionnaire-title').value = 'Geografia Avançada';
+            
+            const exampleContent = `
+                # Geografia Avançada
+                Qual destes países tem a maior população? % *China % Índia % Estados Unidos % Indonésia
+                Qual é o maior lago da África? % Vitória % *Tanganyika % Malawi % Chade
+                Capital da Islândia? % *Reiquiavique % Bergen % Oslo % Helsinque
+            `;
+            
+            const lines = exampleContent.trim().split('\n');
+            lines.forEach((line, index) => {
+                if (index === 0) return;
+                addQuestion();
+                const block = document.querySelectorAll('.question-block')[index-1];
+                const parts = line.split('%').map(p => p.trim());
+                block.querySelector('textarea').value = parts[0];
+                parts.slice(1).forEach((opt, i) => {
+                    const input = block.querySelectorAll('.option-input')[i];
+                    const isCorrect = opt.startsWith('*');
+                    input.value = isCorrect ? opt.slice(1) : opt;
+                    if (isCorrect) {
+                        block.querySelectorAll('.correct-check')[i].checked = true;
+                    }
+                });
+            });
+        }
+
+        function importQN() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.qn';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const content = e.target.result;
+                    const lines = content.trim().split('\n');
+                    document.getElementById('questionnaire-title').value = lines[0].slice(2).trim();
+                    lines.slice(1).forEach((line, index) => {
+                        addQuestion();
+                        const block = document.querySelectorAll('.question-block')[index];
+                        const parts = line.split('%').map(p => p.trim());
+                        block.querySelector('textarea').value = parts[0];
+                        parts.slice(1).forEach((opt, i) => {
+                            const input = block.querySelectorAll('.option-input')[i];
+                            const isCorrect = opt.startsWith('*');
+                            input.value = isCorrect ? opt.slice(1) : opt;
+                            if (isCorrect) {
+                                block.querySelectorAll('.correct-check')[i].checked = true;
+                            }
+                        });
+                    });
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const toggleBtn = document.querySelector('.mode-toggle');
+            toggleBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+    </script>
+</body>
+</html>

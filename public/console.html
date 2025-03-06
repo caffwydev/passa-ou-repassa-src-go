@@ -1,0 +1,102 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console Arduino</title>
+    <style>
+        :root {
+            --color-online: #4CAF50;
+            --color-offline: #F44336;
+            --color-background: #1E1E1E;
+            --color-text: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Consolas', monospace;
+            margin: 0;
+            padding: 20px;
+            background: var(--color-background);
+            color: var(--color-text);
+        }
+
+        .status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .online { background: var(--color-online); }
+        .offline { background: var(--color-offline); }
+
+        #console {
+            max-width: 800px;
+            margin: 0 auto;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+
+        .log {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .debug { color: #9E9E9E; }
+        .info { background: #0D47A122; }
+        .success { background: #1B5E2022; }
+        .warning { background: #FF6F0022; }
+        .error { background: #B71C1C22; }
+
+    </style>
+</head>
+<body>
+    <div class="status offline" id="status">OFFLINE</div>
+    
+    <div id="console"></div>
+
+    <script src="/scripts/socket.js"></script>
+    <script>
+        const socket = io('http://' + window.location.hostname + ':3000');
+        const consoleDiv = document.getElementById('console');
+        const statusDiv = document.getElementById('status');
+
+        // Funções de log
+        function addLog(log) {
+            const logElement = document.createElement('div');
+            logElement.className = `log ${log.level}`;
+            logElement.innerHTML = `
+                <span class="time">[${log.time}]</span>
+                <span class="message">${log.message}</span>
+            `;
+            consoleDiv.appendChild(logElement);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        // Listeners de eventos
+        socket.on('log', addLog);
+        
+        socket.on('status', status => {
+            statusDiv.className = `status ${status==="true" ? 'online' : 'offline'}`;
+            statusDiv.textContent = status==="true" ? 'ONLINE' : 'OFFLINE';
+        });
+
+        socket.on('button', data => {
+            addLog({
+                level: 'info',
+                message: `Botão pressionado: ${data}`,
+                time: new Date().toLocaleTimeString()
+            });
+        });
+    </script>
+</body>
+</html>
