@@ -88,9 +88,9 @@ body {
 #alternative-2,
 #alternative-3,
 #alternative-4 {
-  word-wrap: break-word;
-  word-break: break-all;
+  word-wrap: normal;
   font-size: 20px;
+  word-break: keep-all;
 }
 
 #blue-score,
