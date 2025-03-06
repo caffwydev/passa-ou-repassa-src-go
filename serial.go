@@ -3,6 +3,7 @@ package main
 
 import (
 	"bufio"
+	"log"
 	"strings"
 	"time"
 
@@ -77,6 +78,7 @@ func (p *ArduinoPairer) keepAlive() {
 	for p.connected {
 		for range ticker.C {
 			if _, err := p.currentPort.Write([]byte("PI\n")); err != nil {
+				println(err)
 				p.disconnect()
 				return
 			}
@@ -112,6 +114,8 @@ func (p *ArduinoPairer) disconnect() {
 		p.connected = false
 		currentStatus.Online = false
 		EmitAll("status", "false")
+		lastPing = time.Now()
+
 		sendLog("warning", "Conexão perdida com o dispositivo")
 	}
 }
@@ -120,6 +124,7 @@ func (p *ArduinoPairer) monitorConnection() {
 	for p.connected {
 		time.Sleep(100 * time.Millisecond)
 		if time.Since(lastPing) > time.Second*5 {
+			log.Default().Println("[Pareamento] [v2] (⭍ THUNDERBOLT) Timed out")
 			p.disconnect()
 		}
 	}
@@ -157,12 +162,6 @@ func (s *ArduinoScanner) Scan() ([]string, error) {
 
 	var validPorts []string
 	for _, portName := range ports {
-		port, err := serial.Open(portName, &serial.Mode{})
-		if err != nil {
-			continue
-		}
-		defer port.Close()
-
 		vid := getPortIdentifiers(portName)
 		if s.vendorIDs[vid] {
 			validPorts = append(validPorts, portName)

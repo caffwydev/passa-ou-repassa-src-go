@@ -48,10 +48,16 @@ func main() {
 
 	// Configurar Socket.IO
 
+	c := socket.DefaultServerOptions()
+	c.SetAllowEIO3(true)
+	c.SetCors(&types.Cors{
+		Origin:      "*",
+		Credentials: true,
+	})
+
 	// Inicialize o servidor Socket.IO
 	httpserver = types.CreateServer(nil)
-	server = socket.NewServer(httpserver, nil)
-
+	server = socket.NewServer(httpserver, c)
 	// Manipulador para novas conexões
 	server.On("connection", func(clients ...any) {
 		client := clients[0].(*socket.Socket)
