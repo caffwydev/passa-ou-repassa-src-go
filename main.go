@@ -61,12 +61,17 @@ func main() {
 	// Manipulador para novas conexões
 	server.On("connection", func(clients ...any) {
 		client := clients[0].(*socket.Socket)
+		if isOnline {
+			client.Emit("status", "true")
+		} else {
+			client.Emit("status", "false")
+		}
 		// Envie o status de emparelhamento a cada segundo
 		ticker := time.NewTicker(1 * time.Second)
 		go func() {
 			for range ticker.C {
 				//client.Emit("info", map[string]bool{"paired": isOnline})
-				log.Println("[Pareamento] [v2] (⭍ THUNDERBOLT) PING SENT SUCCESSFULLY!")
+				log.Println("[Pareamento] [v2] (⭍ THUNDERBOLT) Ping sent successfully!")
 				if isOnline {
 					client.Emit("status", "true")
 				} else {

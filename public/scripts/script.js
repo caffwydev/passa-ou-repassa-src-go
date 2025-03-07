@@ -39,11 +39,16 @@ let Answer = "";
 let gameSettings = {};
 let CanAnswer = false;
 let CanRepassar = true;
+let isGameRunning = false;
 
 const Toast = Swal.mixin({
   toast: true,
-  position: "top-end",
+  position: "bottom-end",
   showConfirmButton: false,
+  iconColor: "white",
+  customClass: {
+    popup: 'colored-toast',
+  },
   timer: 3000,
   timerProgressBar: true,
   didOpen: (toast) => {
@@ -110,12 +115,16 @@ function HighLight(alternativeName) {
     let parentDiv = document.querySelector(
       `div.alt-${{ a: 1, b: 2, c: 3, d: 4 }[alternativeName]}`
     );
-    parentDiv.classList.add("bg-purple-900");
+    document.querySelector(`div.alt-1`).classList.remove("bg-purple-800/40");
+    document.querySelector(`div.alt-2`).classList.remove("bg-purple-800/40");
+    document.querySelector(`div.alt-3`).classList.remove("bg-purple-800/40");
+    document.querySelector(`div.alt-4`).classList.remove("bg-purple-800/40");
+    parentDiv.classList.add("bg-purple-800/40");
   } else {
-    document.querySelector(`div.alt-1`).classList.remove("bg-purple-900");
-    document.querySelector(`div.alt-2`).classList.remove("bg-purple-900");
-    document.querySelector(`div.alt-3`).classList.remove("bg-purple-900");
-    document.querySelector(`div.alt-4`).classList.remove("bg-purple-900");
+    document.querySelector(`div.alt-1`).classList.remove("bg-purple-800/40");
+    document.querySelector(`div.alt-2`).classList.remove("bg-purple-800/40");
+    document.querySelector(`div.alt-3`).classList.remove("bg-purple-800/40");
+    document.querySelector(`div.alt-4`).classList.remove("bg-purple-800/40");
   }
 }
 
@@ -154,6 +163,7 @@ let settings = {
   inverter: false,
   modoMisterio: false,
   semPlacar: false,
+  semMostrarPlacar: true,
 };
 
 function saveSettings() {
@@ -168,6 +178,7 @@ function loadSettings() {
 }
 
 loadSettings();
+
 const bgm = new Audio("/audio/bgm.mp3");
 bgm.addEventListener("canplaythrough", () => {
   bgm.volume = settings.backgroundMusic ? 0.05 : 0;
@@ -192,6 +203,7 @@ function startTyping(d) {
   if (d === "") return;
   if (d.length > 110) questionTextElement.style.fontSize = "24px";
   if (d.length < 111) questionTextElement.style.fontSize = "32px";
+  if (d.length < 50) questionTextElement.style.fontSize = "48px";
   for (let i = 0; i < d.length; i++) {
     setTimeout(
       () => (questionTextElement.textContent += d[i]),
@@ -205,7 +217,7 @@ function startTyping(d) {
 function setSubtext(subtext) {
   if (subtext) {
     questionSubTextElement.innerHTML = subtext;
-    questionSubTextElement.style.fontSize = "16px";
+    questionSubTextElement.style.fontSize = "24px";
     questionSubTextElement.style.display = "block";
     questionSubTextElement.classList.add("typing");
   } else {
@@ -247,6 +259,8 @@ function startQuiz(name) {
 }
 
 function reset(callback) {
+  blueElement.classList.remove("choose");
+  redElement.classList.remove("choose");
   if (
     redElement.classList.contains("expanded") ||
     blueElement.classList.contains("expanded")
@@ -264,7 +278,9 @@ function blueSelect() {
     Scoreboard.Selected = 1;
     CanAnswer = true;
     blueElement.classList.add("expanded");
-    redElement.classList.remove("expanded");
+    redElement.classList.add("expanded");
+    blueElement.classList.add("choose");
+    redElement.classList.remove("choose");
     ripple(document.querySelector(".blue"), true);
     click.play();
   });
@@ -274,8 +290,10 @@ function redSelect() {
   reset(() => {
     Scoreboard.Selected = 2;
     CanAnswer = true;
-    blueElement.classList.remove("expanded");
+    blueElement.classList.add("expanded");
     redElement.classList.add("expanded");
+    redElement.classList.add("choose");
+    blueElement.classList.remove("choose");
     ripple(document.querySelector(".red"));
     click.play();
   });
@@ -283,6 +301,8 @@ function redSelect() {
 
 function ShowScore() {
   reset(() => {
+    blueElement.classList.remove("choose");
+    redElement.classList.remove("choose");
     blueElement.classList.add("expanded");
     redElement.classList.add("expanded");
     board.play();
@@ -296,7 +316,7 @@ let justStarted = true;
 socket.on("connect", () => {
   appStatusElement.textContent = "Pareando";
   if (justStarted) {
-    startTyping(`Passa ou Repassa`);
+    startTyping(`Passa ou Repassa - Next Gen`);
     justStarted = false;
   }
   appStatusElement.classList.remove("text-red-600");
@@ -340,6 +360,7 @@ socket.on("status", (info) => {
 
 function openSettingsModal() {
   Swal.fire({
+    theme: "dark",
     title: "Configurações",
     showClass: {
       backdrop: "swal2-noanimation",
@@ -396,6 +417,15 @@ function openSettingsModal() {
                       <span class="slider"></span>
                   </label>
               </div>
+              <div class="setting">
+                  <span class="setting-label">Não mostrar placar (RECOMENDADO)</span>
+                  <label class="switch">
+                      <input type="checkbox" id="semplac2" ${
+                        settings.semMostrarPlacar ? "checked" : ""
+                      }>
+                      <span class="slider"></span>
+                  </label>
+              </div>
           </div>
       `,
     showCloseButton: true,
@@ -406,6 +436,7 @@ function openSettingsModal() {
       const soundEffect = document.getElementById("sound-effect").checked;
       const inverter = document.getElementById("inverter").checked;
       const semPlacar = document.getElementById("semplac").checked;
+      const semMostrarPlacar = document.getElementById("semplac2").checked;
 
       const modoMisterio =
         semPlacar || document.getElementById("modomist").checked;
@@ -416,6 +447,7 @@ function openSettingsModal() {
         inverter,
         modoMisterio,
         semPlacar,
+        semMostrarPlacar,
       };
     },
   }).then((result) => {
@@ -434,6 +466,7 @@ function openSettingsModal() {
 }
 function openHelp() {
   Swal.fire({
+    theme: "dark",
     title: "Ajuda",
     showClass: {
       backdrop: "swal2-noanimation",
@@ -518,7 +551,7 @@ function ripple(element, eee) {
 }
 socket.on("button", (r) => {
   console.log(r);
-  if (WaitingSignal && r !== "PO" && r !== "O") {
+  if (WaitingSignal && r !== "PO" && r !== "O" && r !== "P") {
     WaitingSignal = false;
     if (r == (settings.inverter ? "2" : "1")) {
       blueSelect();
@@ -537,9 +570,14 @@ socket.on("button", (r) => {
     }
   }
 });
+function changeColors(red, blue) {
+  document.documentElement.style.setProperty('--red-color', red);
+  document.documentElement.style.setProperty('--blue-color', blue);
+}
 
 function setupGame(questionary, questionaries) {
   Swal.fire({
+    theme: "dark",
     title: "Configurar jogo",
     showClass: {
       backdrop: "swal2-noanimation",
@@ -571,9 +609,9 @@ function setupGame(questionary, questionaries) {
             <div class="settings-container">
               <select
                 id="color1"
-                class="block w-full text-sm text-black border border-gray-200 rounded-sm bg-white-600 focus:ring-blue-300 focus:border-blue-300"
+                class="block w-full text-sm text-white border border-gray-200 rounded-sm bg-neutral-800 focus:ring-blue-300 focus:border-blue-300"
               >
-                <option value="#007bff" selected>
+                <option value="007bff" selected>
                   Azul
                 </option>
                 <option value="ff0000">
@@ -600,9 +638,9 @@ function setupGame(questionary, questionaries) {
           <label class="selecter">
             <select
               id="color2"
-              class="block w-full text-sm text-black border border-gray-200 rounded-sm bg-white-600 focus:ring-blue-300 focus:border-blue-300"
+              class="block w-full text-sm text-white border border-gray-200 rounded-sm bg-neutral-800 focus:ring-blue-300 focus:border-blue-300"
             >
-              <option value="#007bff">
+              <option value="007bff">
                 Azul
               </option>
               <option value="ff0000" selected>
@@ -666,14 +704,14 @@ function setupGame(questionary, questionaries) {
   }).then((result) => {
     if (result.isConfirmed) {
       const configs = result.value;
-      blueElement.style.backgroundColor = "#" + configs.color1;
-      redElement.style.backgroundColor = "#" + configs.color2;
+      blueElement.style.backgroundColor = "#" + configs.color1 + "66";
+      redElement.style.backgroundColor = "#" + configs.color2 + "66";
       document.querySelector("#team1_marker").textContent = configs.name1;
       document.querySelector("#team2_marker").textContent = configs.name2;
-
+      changeColors("#" + configs.color2, "#" + configs.color1)
       gameSettings = configs;
       Questions = scrambleArray(questionaries[questionary.name].questions);
-
+      isGameRunning = true;
       startQuiz(questionary.name);
     }
   });
@@ -691,6 +729,7 @@ function updateFileName() {
 }
 function openUploaderModal() {
   Swal.fire({
+    theme: "dark",
     title: "Uploader de Arquivos",
     showClass: {
       backdrop: "swal2-noanimation",
@@ -760,6 +799,7 @@ function openStartModal(qs, questionaries) {
   });
 
   Swal.fire({
+    theme: "dark",
     title: "Selecionar Questionário",
     showClass: {
       backdrop: "swal2-noanimation",
@@ -770,7 +810,7 @@ function openStartModal(qs, questionaries) {
       popup: "",
     },
     html: `
-    <select id="questionnaireSelect" class="block w-full p-2 text-sm text-black border border-gray-200 rounded-sm bg-white-600 focus:ring-blue-300 focus:border-blue-300">${Options}</select>
+    <select id="questionnaireSelect" class="block w-full p-2 text-sm text-white border border-gray-200 rounded-sm bg-neutral-800 focus:ring-blue-300 focus:border-blue-300">${Options}</select>
       `,
     showCloseButton: true,
     focusConfirm: false,
@@ -854,6 +894,20 @@ function AnswerQuestion(number) {
       setTimeout(() => {
         document.querySelector(".cross-mark").classList.add("hidden");
         document.querySelector(".success-checkmark").classList.add("hidden");
+        setSubtext();
+        if (settings.semMostrarPlacar) {
+
+          if (gameSettings.autoplay) {
+            restore();
+            askQuestion();
+          } else {
+            canProceed = true;
+            setSubtext(
+              'Pressione <span class="text-red-600" onclick="simulateKey(\'a\')">A</span> para continuar'
+            );
+          }
+          return
+        }
         startTyping("Placar");
         ShowScore();
         setSubtext();
@@ -864,7 +918,7 @@ function AnswerQuestion(number) {
           } else {
             canProceed = true;
             setSubtext(
-              'Pressione <span class="text-red-600">A</span> para continuar'
+              'Pressione <span class="text-red-600" onclick="simulateKey(\'a\')">A</span> para continuar'
             );
           }
         }, 3000);
@@ -894,15 +948,28 @@ function AnswerQuestion(number) {
           }, 1500);
         }, 1500);
       } else {
+        CurrentQuestionNumber++;
+        CanRepassar = true;
         document.querySelector(".cross-mark").classList.add("hidden");
         document.querySelector(".success-checkmark").classList.add("hidden");
         if (settings.modoMisterio) {
-          CurrentQuestionNumber++;
-          CanRepassar = true;
           startTyping("");
           setSubtext();
           restore().then(askQuestion);
           return;
+        }
+        setSubtext();
+        if (settings.semMostrarPlacar) {
+          if (gameSettings.autoplay) {
+            restore();
+            askQuestion();
+          } else {
+            canProceed = true;
+            setSubtext(
+              'Pressione <span class="text-red-600" onclick="simulateKey(\'a\')">A</span> para continuar'
+            );
+          }
+          return
         }
         startTyping("Placar");
         ShowScore();
@@ -914,7 +981,7 @@ function AnswerQuestion(number) {
           } else {
             canProceed = true;
             setSubtext(
-              'Pressione <span class="text-red-600">A</span> para continuar'
+              'Pressione <span class="text-red-600" onclick="simulateKey(\'a\')">A</span> para continuar'
             );
           }
         }, 3000);
@@ -984,4 +1051,74 @@ winModal = () => {
       suspense.play();
     });
   }, 1500);
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  const buttons = document.querySelectorAll(".btn-action");
+  const footer = document.getElementById("footer");
+
+
+  // Botões simulam teclas S, U, B, C
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const keyEvent = new KeyboardEvent("keydown", {
+        key: button.dataset.key,
+      });
+      document.dispatchEvent(keyEvent);
+    });
+  });
+
+  // Ocultar footer quando não estiver com mouse em cima
+  document.querySelector("#hover-area").addEventListener("mousemove", () => {
+    footer.style.opacity = 1;
+    footer.style.transform = "translateY(0)";
+    clearTimeout(footer.timeout);
+    footer.timeout = setTimeout(() => {
+      footer.style.opacity = 0;
+      footer.style.transform = "translateY(-100%)";
+    }, 3000);
+  });
+  document.querySelector("#footer").addEventListener("mousemove", () => {
+    footer.style.opacity = 1;
+    footer.style.transform = "translateY(0)";
+    clearTimeout(footer.timeout);
+    footer.timeout = setTimeout(() => {
+      footer.style.opacity = 0;
+      footer.style.transform = "translateY(-100%)";
+    }, 3000);
+  });
+  footer.timeout = setTimeout(() => {
+    footer.style.opacity = 0;
+    footer.style.transform = "translateY(-100%)";
+  }, 3000);
+
+  // Scoreboard selecionado
+  function updateSelection() {
+    const blue = document.querySelector("div.team.blue");
+    const red = document.querySelector("div.team.red");
+
+    blue.classList.remove("selected");
+    red.classList.remove("selected");
+
+    if (Scoreboard.Selected === 1) {
+      blue.classList.add("selected");
+    } else if (Scoreboard.Selected === 2) {
+      red.classList.add("selected");
+    }
+  }
+
+  // Observar mudanças no Scoreboard
+  setInterval(updateSelection, 100);
+
+  // Ocultar botões quando o jogo está rodando
+  setInterval(() => {
+    document.getElementById("action-buttons").style.display = isGameRunning
+      ? "none"
+      : "grid";
+  }, 100);
+});
+
+const simulateKey = (key) => {
+  console.log(key)
+  document.dispatchEvent(new KeyboardEvent("keydown", { key }));
 };

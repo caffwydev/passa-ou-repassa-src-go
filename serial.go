@@ -101,6 +101,8 @@ func (p *ArduinoPairer) readMessages() {
 			lastPing = time.Now()
 		case msg == "O":
 			lastPing = time.Now()
+		case msg == "P":
+			lastPing = time.Now()
 		default:
 			EmitAll("button", msg)
 			sendLog("info", "Botão pressionado: "+msg)

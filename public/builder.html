@@ -3,26 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Construtor de Questionários</title>
+    <title>Passa ou Repassa - Construir Quiz</title>
+    <link href="icons/css/fontawesome.css" rel="stylesheet" />
+    <link href="icons/css/brands.css" rel="stylesheet" />
+    <link href="icons/css/solid.css" rel="stylesheet" />
     <style>
-        :root {
-            --bg-color: #f5f5f5;
-            --card-bg: #ffffff;
-            --primary: #7c3aed;
-            --secondary: #4f46e5;
-            --text: #333333;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --border: #e0e0e0;
-        }
-
-        .dark-mode {
-            --bg-color: #1a1a1a;
-            --card-bg: #2d2d2d;
-            --text: #e0e0e0;
-            --border: #404040;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -31,8 +16,8 @@
         }
 
         body {
-            background: var(--bg-color);
-            color: var(--text);
+            background: #0f172a;
+            color: #e2e8f0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -44,21 +29,36 @@
             max-width: 800px;
             width: 100%;
             margin: 0 auto;
+            position: relative;
         }
 
         .header {
             text-align: center;
             margin-bottom: 2rem;
+            position: relative;
         }
 
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            color: #7c3aed;
+            text-shadow: 0 0 10px #7c3aed80;
+            animation: neonPulse 2s infinite;
         }
+
+        .question-block {
+            background: #1e293b;
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transform: translateX(110%);
+        }
+
 
         .controls {
             display: flex;
@@ -78,63 +78,142 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            background: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
         }
 
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
+        button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
         }
 
-        .btn-secondary {
-            background: var(--card-bg);
-            color: var(--text);
-            border: 1px solid var(--border);
+        .question-carousel {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-nav {
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            text-align: center;
+            color: #7c3aed;
+            text-shadow: 0 0 10px #7c3aed80;
+            z-index: 99999;
+        }
+
+        .carousel-nav.inactive {
+            color: #475569;
+            cursor: not-allowed;
+            text-shadow: none;
+        }
+        .carousel-nav.active {
+            color: #7c3aed;
+            text-shadow: 0 0 10px #7c3aed80;
+        }
+
+        .questions-wrapper {
+            flex: 1;
+            position: relative;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .correct-check {
+            display: none;
         }
 
         .question-block {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(110%);
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            margin-left: 50px;
+            margin-right: 50px;
+        }
+
+        .question-block.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .question-block.prev {
+            transform: translateX(-110%);
+            opacity: 0.2;
+            filter: blur(2px);
+        }
+        textarea {
+            resize: none !important;
+        }
+
+        .question-block.next {
+            transform: translateX(110%);
+            opacity: 0.2;
+            filter: blur(2px);
+        }
+        .question-block.slide-left {
+            animation: slideOutLeft 0.2s forwards;
+        }
+
+        .question-block.slide-right {
+            animation: slideOutRight 0.2s forwards;
+        }
+
+        @keyframes slideOutLeft {
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideOutRight {
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
 
         .question-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .question-title {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 600;
-        }
-
-        .delete-btn {
-            background: #dc2626;
-            padding: 0.4rem 0.8rem;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            color: #7c3aed;
         }
 
         textarea {
             width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
+            background: #0f172a;
+            border: 1px solid #334155;
             border-radius: 8px;
             padding: 1rem;
-            color: var(--text);
-            margin-bottom: 1rem;
+            color: #e2e8f0;
+            margin-bottom: 1.5rem;
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 10px #7c3aed80;
+            outline: none;
         }
 
         .options-grid {
@@ -145,17 +224,22 @@
 
         .option-item {
             position: relative;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
+            background: #0f172a;
+            border: 1px solid #334155;
             border-radius: 8px;
             padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .option-item:hover {
+            border-color: #7c3aed;
         }
 
         .option-item input {
             width: 100%;
             background: none;
             border: none;
-            color: var(--text);
+            color: #e2e8f0;
             padding: 0.5rem;
             font-size: 1rem;
         }
@@ -164,7 +248,7 @@
             position: absolute;
             top: -10px;
             right: -10px;
-            background: var(--success);
+            background: #10b981;
             color: white;
             width: 24px;
             height: 24px;
@@ -173,119 +257,207 @@
             align-items: center;
             justify-content: center;
             font-size: 14px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
 
         .correct-check:checked + .option-item {
-            border: 2px solid var(--success);
+            border: 2px solid #10b981;
+            box-shadow: 0 0 10px #10b98180;
         }
 
         .correct-check:checked + .option-item .correct-marker {
             display: flex;
         }
 
-        .correct-check {
-            display: none;
-        }
-
         #questionnaire-title {
             width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
+            background: #1e293b;
+            border: 1px solid #334155;
             border-radius: 8px;
             padding: 1rem;
             font-size: 1.5rem;
-            color: var(--text);
+            color: #e2e8f0;
             margin-bottom: 2rem;
             text-align: center;
+            transition: all 0.3s ease;
         }
 
-        .drag-handle {
-            cursor: move;
-            opacity: 0.6;
-            padding: 0.5rem;
+        #questionnaire-title:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 10px #7c3aed80;
+            outline: none;
         }
 
-        .drag-handle:hover {
-            opacity: 1;
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 10px #7c3aed80; }
+            50% { text-shadow: 0 0 20px #7c3aed, 0 0 30px #7c3aed80; }
         }
 
-        .mode-toggle {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+        .delete-btn {
+            background: #dc2626;
             padding: 0.5rem 1rem;
-            cursor: pointer;
+            border-radius: 8px;
+            border: 1px solid #991b1b;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #991b1b;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Construtor de Questionário</h1>
-            <input type="text" id="questionnaire-title" placeholder="Digite o título do questionário">
+            <h1>Construtor de Quiz</h1>
+            <input type="text" id="questionnaire-title" placeholder="Nome do Questionário">
         </div>
 
         <div class="controls">
-            <button class="btn-primary" onclick="addQuestion()">
-                <span>➕</span> Nova Pergunta
+            <button class="px-4 py-1 rounded-md bg-purple-600/40 border-2 border-purple-700 hover:bg-purple-800 transition-all text-white" onclick="addQuestion()">
+                <i class="fa-solid fa-plus mr-2"></i> Nova Questão
             </button>
-            <button class="btn-primary" onclick="generateQN()">
-                <span>📤</span> Exportar
+            <button class="px-4 py-1 rounded-md bg-green-600/40 border-2 border-green-700 hover:bg-green-800 transition-all text-white" onclick="generateQN()">
+                <i class="fa-solid fa-file-export mr-2"></i> Exportar
             </button>
-            <button class="btn-secondary" onclick="loadAdvancedExample()">
-                <span>🔄</span> Carregar Exemplo
+            <button class="px-4 py-1 rounded-md bg-blue-600/40 border-2 border-blue-700 hover:bg-blue-800 transition-all text-white" onclick="importQN()">
+                <i class="fa-solid fa-file-import mr-2"></i> Importar
             </button>
-            <button class="btn-secondary" onclick="importQN()">
-                <span>📥</span> Importar
-            </button>
-            <button class="btn-secondary" onclick="window.location.href = '/'">
-                <span>🔙</span> Voltar
+            <button class="px-4 py-1 rounded-md bg-blue-600/40 border-2 border-blue-700 hover:bg-blue-800 transition-all text-white" onclick="window.location.href = '/'">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
             </button>
         </div>
 
-        <div id="questions-container"></div>
+        <div class="question-carousel">
+            <div class="carousel-nav" id="prevBtn" onclick="prevQuestion()"><i class="fa-solid fa-chevron-left"></i></div>
+            <div class="questions-wrapper" id="questions-container"></div>
+            <div class="carousel-nav" id="nextBtn" onclick="nextQuestion()"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
     </div>
 
-    <button class="mode-toggle" onclick="toggleDarkMode()">🌙</button>
-
     <script>
-        let questionCount = 0;
+        let questions = [];
+        let currentQuestion = 0;
+        let xx = 0
+
+        // Inicializa com uma questão
+        window.onload = addQuestion;
 
         function createQuestionBlock() {
             const block = document.createElement('div');
             block.className = 'question-block';
+            block.id = "block"+xx
             block.innerHTML = `
                 <div class="question-header">
                     <div class="question-title">Questão</div>
-                    <button class="delete-btn" onclick="this.parentElement.parentElement.remove()">🗑️</button>
+                    <button class="delete-btn" onclick="deleteQuestion(${questions.length})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
                 </div>
-                <textarea placeholder="Digite a pergunta"></textarea>
+                <textarea placeholder="Digite sua pergunta..." rows="3"></textarea>
                 <div class="options-grid">
-                    ${Array.from({length: 4}, () => `
+                    ${Array.from({length: 4}, (_, i) => `
                     <label>
-                        <input type="radio" name="question${questionCount}" class="correct-check" 
-                               onclick="toggleCorrect(this)">
+                        <input type="radio" name="question${questions.length}" class="correct-check" 
+                               onclick="toggleCorrect(this, ${questions.length}, ${i})">
                         <div class="option-item">
                             <div class="correct-marker">✓</div>
-                            <input type="text" class="option-input" placeholder="Opção">
+                            <input type="text" class="option-input" placeholder="Opção ${i + 1}">
                         </div>
                     </label>
                     `).join('')}
                 </div>
             `;
-            questionCount++;
             return block;
         }
-
-        function addQuestion() {
-            const container = document.getElementById('questions-container');
-            container.appendChild(createQuestionBlock());
+        function prevQuestion() {
+            if(currentQuestion > 0) {
+                currentQuestion--;
+                updateCarousel();
+            }
         }
 
-        function toggleCorrect(radio) {
+        function nextQuestion() {
+            if(currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                updateCarousel();
+            }
+        }
+
+        // Função updateCarousel corrigida
+        function updateCarousel() {
+            const container = document.querySelectorAll('#questions-container .question-block');
+            if (currentQuestion > container.length) {
+                currentQuestion = container.length;
+            }
+            container.forEach((elmmt, index) => {
+                const block = elmmt;
+                
+                if(index === currentQuestion) {
+                    block.classList.remove('hidden');
+                    block.classList.add('active');
+                    block.classList.remove('prev');
+                    block.classList.remove('next');
+                } else if(index === currentQuestion - 1) {
+                    block.classList.remove('hidden');
+                    block.classList.remove('active');
+                    block.classList.remove('next');
+                    block.classList.add('prev');
+                } else if(index === currentQuestion + 1) {
+                    block.classList.remove('hidden');
+                    block.classList.remove('active');
+                    block.classList.remove('prev');
+                    block.classList.add('next');
+                } else {
+                    block.classList.add('hidden');
+                    block.classList.remove('active');
+                    block.classList.remove('prev');
+                    block.classList.remove('next');
+                }
+                
+            });
+
+            // Atualizar estado das setas
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.classList.toggle('inactive', currentQuestion === 0);
+            nextBtn.classList.toggle('inactive', currentQuestion === container.length - 1);
+        }
+        const qcontainer = document.querySelector('#questions-container');
+        function addQuestion() {
+            const container = document.querySelectorAll('#questions-container .question-block');
+            xx++
+            const newQuestion = {
+                element: createQuestionBlock(),
+                data: {
+                    question: '',
+                    options: Array(4).fill(''),
+                    correct: -1
+                }
+            };
+            qcontainer.appendChild(newQuestion.element)
+            questions.push(newQuestion);
+            currentQuestion = container.length;
+            updateCarousel();
+        }
+
+        function deleteQuestion(index) {
+            const qst =  document.querySelector("#block" + (parseInt(index)+1))
+            questions.splice(index, 1);
+            
+            if(qst.classList.contains('active')) {
+                currentQuestion = Math.min(currentQuestion, questions.length - 1);
+            }
+            
+            qst.remove()
+            
+            updateCarousel();
+        }
+
+        function toggleCorrect(radio, questionIndex, optionIndex) {
+            questions[questionIndex].data.correct = optionIndex;
             const options = radio.closest('.options-grid').querySelectorAll('.correct-check');
             options.forEach(opt => opt.checked = false);
             radio.checked = true;
@@ -293,58 +465,26 @@
 
         function generateQN() {
             const title = document.getElementById('questionnaire-title').value.trim();
-            if (!title) {
-                alert('Digite um título para o questionário!');
-                return;
-            }
+            if(!title) return alert('Digite um título!');
 
             let qnContent = `# ${title}\n`;
             
-            document.querySelectorAll('.question-block').forEach(block => {
-                const question = block.querySelector('textarea').value.trim();
-                const options = Array.from(block.querySelectorAll('.option-input')).map(input => {
-                    const isCorrect = input.closest('label').querySelector('.correct-check').checked;
-                    return isCorrect ? `*${input.value.trim()}` : input.value.trim();
+            questions.forEach(question => {
+                const qText = question.element.querySelector('textarea').value.trim();
+                const options = Array.from(question.element.querySelectorAll('.option-input')).map((input, i) => {
+                    return i === question.data.correct ? `*${input.value.trim()}` : input.value.trim();
                 });
 
-                if (question && options.every(opt => opt)) {
-                    qnContent += `${question} % ${options.join(' % ')}\n`;
+                if(qText && options.every(opt => opt)) {
+                    qnContent += `${qText} % ${options.join(' % ')}\n`;
                 }
             });
 
-            const blob = new Blob([qnContent], { type: 'text/plain;charset=utf-8' });
+            const blob = new Blob([qnContent], { type: 'text/plain' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `${title.replace(/[^a-z0-9]/gi, '_')}.qn`;
+            link.download = `${title.replace(/[^\w]/g, '_')}.qn`;
             link.click();
-        }
-
-        function loadAdvancedExample() {
-            document.getElementById('questionnaire-title').value = 'Geografia Avançada';
-            
-            const exampleContent = `
-                # Geografia Avançada
-                Qual destes países tem a maior população? % *China % Índia % Estados Unidos % Indonésia
-                Qual é o maior lago da África? % Vitória % *Tanganyika % Malawi % Chade
-                Capital da Islândia? % *Reiquiavique % Bergen % Oslo % Helsinque
-            `;
-            
-            const lines = exampleContent.trim().split('\n');
-            lines.forEach((line, index) => {
-                if (index === 0) return;
-                addQuestion();
-                const block = document.querySelectorAll('.question-block')[index-1];
-                const parts = line.split('%').map(p => p.trim());
-                block.querySelector('textarea').value = parts[0];
-                parts.slice(1).forEach((opt, i) => {
-                    const input = block.querySelectorAll('.option-input')[i];
-                    const isCorrect = opt.startsWith('*');
-                    input.value = isCorrect ? opt.slice(1) : opt;
-                    if (isCorrect) {
-                        block.querySelectorAll('.correct-check')[i].checked = true;
-                    }
-                });
-            });
         }
 
         function importQN() {
@@ -355,33 +495,33 @@
                 const file = e.target.files[0];
                 const reader = new FileReader();
                 reader.onload = e => {
-                    const content = e.target.result;
-                    const lines = content.trim().split('\n');
+                    questions = [];
+                    const lines = e.target.result.trim().split('\n');
                     document.getElementById('questionnaire-title').value = lines[0].slice(2).trim();
-                    lines.slice(1).forEach((line, index) => {
+                    
+                    lines.slice(1).forEach(line => {
                         addQuestion();
-                        const block = document.querySelectorAll('.question-block')[index];
+                        const question = questions[questions.length - 1];
                         const parts = line.split('%').map(p => p.trim());
-                        block.querySelector('textarea').value = parts[0];
+                        
+                        question.element.querySelector('textarea').value = parts[0];
                         parts.slice(1).forEach((opt, i) => {
-                            const input = block.querySelectorAll('.option-input')[i];
+                            const input = question.element.querySelectorAll('.option-input')[i];
                             const isCorrect = opt.startsWith('*');
+                            
                             input.value = isCorrect ? opt.slice(1) : opt;
-                            if (isCorrect) {
-                                block.querySelectorAll('.correct-check')[i].checked = true;
+                            if(isCorrect) {
+                                question.data.correct = i;
+                                question.element.querySelectorAll('.correct-check')[i].checked = true;
                             }
                         });
                     });
+                    currentQuestion = 0;
+                    updateCarousel();
                 };
                 reader.readAsText(file);
             };
             input.click();
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const toggleBtn = document.querySelector('.mode-toggle');
-            toggleBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
         }
     </script>
 </body>

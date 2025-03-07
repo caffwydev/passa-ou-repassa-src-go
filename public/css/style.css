@@ -8,6 +8,16 @@ body {
   height: 100vh;
 }
 
+.team::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4); /* Set the opacity here */
+  z-index: -1;
+}
 .app {
   width: 100%;
   height: 100vh;
@@ -17,7 +27,6 @@ body {
 }
 
 .question {
-  background-color: #00be55;
   color: white;
   padding: 20px;
   border-radius: 2px;
@@ -32,20 +41,18 @@ body {
 }
 
 .team.expanded {
-  width: 30%;
-  padding: 10px;
+  transform: translateX(0%);
 }
 
 .scoreboard {
   display: flex;
-  background-color: #333;
   color: white;
   border-radius: 2px;
   height: 100%;
 }
 
 .team {
-  width: 0%;
+  width: 30%;
   overflow: hidden !important;
   white-space: nowrap;
   text-align: center;
@@ -53,10 +60,10 @@ body {
   align-items: center;
   justify-content: center;
 
-  -webkit-transition: width 1s ease;
-  -moz-transition: width 1s ease;
-  -o-transition: width 1s ease;
-  transition: width 1s ease;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 
   position: relative;
   overflow: hidden;
@@ -75,13 +82,15 @@ body {
 }
 
 .blue {
+  transform: translateX(-120%);
   background-color: #0d6eff;
-  border-radius: 2px;
+  border-radius: 10px;
 }
 
 .red {
+  transform: translateX(120%);
   background-color: #ff4136;
-  border-radius: 2px;
+  border-radius: 10px;
 }
 
 #alternative-1,
@@ -176,6 +185,11 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+input, select {
+  background-color: transparent !important;
+  color: white !important; 
+}
+
 .team span.ripple {
   position: absolute;
   border-radius: 50%;
@@ -188,7 +202,7 @@ input:checked + .slider:before {
   /* for positioning */
   margin-left: -50px;
 
-  animation: ripple 2s;
+  animation: ripple 5s;
   opacity: 0;
 }
 
@@ -198,10 +212,14 @@ input:checked + .slider:before {
     opacity: 1;
     transform: scale(0);
   }
+  50% {
+    opacity: 1;
+    transform: scale(0);
+  }
 
-  to {
+  100% {
     opacity: 0;
-    transform: scale(100);
+    transform: scale(200);
   }
 }
 
@@ -434,3 +452,220 @@ input:checked + .slider:before {
   font-size: 64px;
   margin-left: 20px;
 }
+
+
+
+
+
+
+
+
+.team[data-selected="true"] {
+  animation: neonPulse 1.5s infinite;
+  box-shadow: 0 0 15px currentColor;
+}
+
+@keyframes neonPulse {
+  0%, 100% { box-shadow: 0 0 15px currentColor; }
+  50% { box-shadow: 0 0 25px currentColor; }
+}
+
+/* Footer auto-hide */
+body > footer {
+  position: fixed;
+  bottom: 0;
+  transform: translateY(100%);
+  transition: transform 0.3s;
+  z-index: 50;
+}
+
+body > footer {
+  transform: translateY(0);
+}
+
+/* Cursor nas alternativas */
+[id^="alternative-"] {
+  cursor: pointer;
+}
+
+
+
+#hover-area {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px; /* Área sensível para ativar */
+  background: transparent;
+}
+
+#footer {
+  width: 99vw;
+  margin-left: 0.5vw;
+  margin-right: 0.5vw;
+  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+.colored-toast.swal2-icon-success {
+  background-color: #a5dc86 !important;
+}
+
+.colored-toast.swal2-icon-error {
+  background-color: #f27474 !important;
+}
+
+.colored-toast.swal2-icon-warning {
+  background-color: #f8bb86 !important;
+}
+
+.colored-toast.swal2-icon-info {
+  background-color: #3fc3ee !important;
+}
+
+.colored-toast.swal2-icon-question {
+  background-color: #87adbd !important;
+}
+
+.colored-toast .swal2-title {
+  color: white;
+}
+
+.colored-toast .swal2-close {
+  color: white;
+}
+
+.colored-toast .swal2-html-container {
+  color: white;
+  font-weight: bold;
+}
+.swal2-container:has(.colored-toast) {
+  width: 31vw !important;
+  max-width: 31vw !important;
+}
+body.swal2-shown > [aria-hidden='true'] {
+  transition: 0.1s filter;
+  filter: blur(12px);
+  background-color: rgba(100, 100, 100, 0.5);
+}
+
+#footer, body {
+  overflow: hidden;
+}
+
+:root {
+  --red-color: #ff4136;
+  --blue-color: #0d6eff;
+}
+
+.choose .core{
+  position: absolute;
+  z-index: -5;
+  left: 0%;
+  transform: translate(0%, -50%);
+  width: 100%;
+  height: 150%;
+  animation: rotate 1.5s linear infinite;
+  border-radius: 12px;
+  padding: inherit;
+}
+.choose .hideCore{
+  position: absolute;
+  z-index: -4;
+  left: 0%;
+  transform: translate(0.5%, 0%);
+  width: 99%;
+  height: 99.5%;
+  border-radius: 12px;
+  padding: inherit;
+}
+.choose .hideHideCore{
+  position: absolute;
+  z-index: -2;
+  left: 0%;
+  transform: translate(0.5%, 0%);
+  width: 99%;
+  height: 99.5%;
+  border-radius: 12px;
+  background-color: inherit;
+  padding: inherit;
+}
+.choose .extraGlow{
+  position: absolute;
+  z-index: -3;
+  left: 0%;
+  transform: translate(0.5%, 0%);
+  width: 99%;
+  height: 99.5%;
+  border-radius: 12px;
+  background-color: inherit;
+  padding: inherit;
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.choose h2, .choose span {
+  animation: pulse 1.5s ease-in-out infinite; /* Adjust timing as needed */
+}
+
+.blue.choose .core{
+  background: conic-gradient(
+    var(--blue-color),
+    transparent 30%,
+    transparent 70%,
+    var(--blue-color)
+  );
+  filter: drop-shadow(0 0 8px var(--blue-color));
+}
+
+.red.choose .core{
+  background: conic-gradient(
+    var(--red-color),
+    transparent 30%,
+    transparent 70%,
+    var(--red-color)
+  );
+  filter: drop-shadow(0 0 8px var(--red-color));
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+.choose {
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 20px;
+  color: white;
+  background-color: black;
+  box-shadow: 0 0 10px var(--border-color);
+  animation: glow 1.5s infinite alternate;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 10px var(--border-color);
+  }
+  100% {
+    box-shadow: 0 0 20px var(--border-color), 0 0 30px var(--border-color);
+  }
+}
+
+
+.blue { --border-color: var(--blue-color); }
+.red { --border-color: var(--red-color); }
