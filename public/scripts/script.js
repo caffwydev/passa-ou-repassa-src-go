@@ -187,8 +187,21 @@ bgm.addEventListener("canplaythrough", () => {
   incorrect.volume = settings.soundEffect ? 0.5 : 0;
   board.volume = settings.soundEffect ? 0.5 : 0;
   bgm.loop = true;
-  bgm.play();
 });
+
+
+  function startBGM() {
+    bgm.play().catch(err => {
+      console.log('Erro ao tentar tocar o áudio:', err);
+    });
+
+    // Remover o ouvinte após a primeira execução
+    document.removeEventListener('click', startBGM);
+  }
+
+  // Escuta o primeiro clique do usuário
+  document.addEventListener('click', startBGM);
+
 
 const questionTextElement = document.getElementById("question-text");
 const questionSubTextElement = document.getElementById("question-subtext");
