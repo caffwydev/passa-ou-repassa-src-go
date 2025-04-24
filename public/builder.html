@@ -257,7 +257,7 @@
                     return;
                 }
                 
-                let fileContent = `#${quizTitle.value.trim()}\n`;
+                let fileContent = `# ${quizTitle.value.trim()}\n`;
                 
                 questions.forEach(question => {
                     const questionInput = question.querySelector('.question-input');
@@ -307,7 +307,7 @@
                     return;
                 }
                 
-                let previewContent = `#${quizTitle.value.trim()}\n`;
+                let previewContent = `# ${quizTitle.value.trim()}\n`;
                 
                 const questions = Array.from(questionsContainer.querySelectorAll('.question-item'));
                 questions.forEach(question => {
