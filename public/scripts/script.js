@@ -187,8 +187,21 @@ bgm.addEventListener("canplaythrough", () => {
   incorrect.volume = settings.soundEffect ? 0.5 : 0;
   board.volume = settings.soundEffect ? 0.5 : 0;
   bgm.loop = true;
-  bgm.play();
 });
+
+
+  function startBGM() {
+    bgm.play().catch(err => {
+      console.log('Erro ao tentar tocar o áudio:', err);
+    });
+
+    // Remover o ouvinte após a primeira execução
+    document.removeEventListener('click', startBGM);
+  }
+
+  // Escuta o primeiro clique do usuário
+  document.addEventListener('click', startBGM);
+
 
 const questionTextElement = document.getElementById("question-text");
 const questionSubTextElement = document.getElementById("question-subtext");
@@ -550,7 +563,6 @@ function ripple(element, eee) {
   });
 }
 socket.on("button", (r) => {
-  console.log(r);
   if (WaitingSignal && r !== "PO" && r !== "O" && r !== "P") {
     WaitingSignal = false;
     if (r == (settings.inverter ? "2" : "1")) {
@@ -843,10 +855,8 @@ function InitializeGame() {
       icon: "error",
       text: "Arduino não encontrado! Conecte o arduino antes de iniciar o jogo!",
     });
-  console.log("LEPOOO");
   socket.emit("list-questionaries");
   socket.once("questionary", (questionaries) => {
-    console.log(questionaries);
     let qn = {};
     Object.keys(questionaries).forEach((q) => {
       qn[questionaries[q].id] = q;
@@ -1119,6 +1129,5 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 const simulateKey = (key) => {
-  console.log(key)
   document.dispatchEvent(new KeyboardEvent("keydown", { key }));
 };
