@@ -1,528 +1,348 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passa ou Repassa - Construir Quiz</title>
-    <link href="icons/css/fontawesome.css" rel="stylesheet" />
-    <link href="icons/css/brands.css" rel="stylesheet" />
-    <link href="icons/css/solid.css" rel="stylesheet" />
+    <title>Passa ou Repassa - Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+        .question-item {
+            transition: all 0.2s ease;
         }
-
-        body {
-            background: #0f172a;
-            color: #e2e8f0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
+        .question-item:hover {
+            background-color: rgba(79, 70, 229, 0.1);
         }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-            position: relative;
+        .drag-handle {
+            cursor: move;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-            position: relative;
+        .option-correct {
+            border-left: 4px solid #4f46e5;
         }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #7c3aed;
-            text-shadow: 0 0 10px #7c3aed80;
-            animation: neonPulse 2s infinite;
-        }
-
-        .question-block {
-            background: #1e293b;
-            border-radius: 24px;
-            padding: 2rem;
-            border: 1px solid #334155;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: absolute;
-            width: 100%;
+        .file-input {
+            width: 0.1px;
+            height: 0.1px;
             opacity: 0;
-            transform: translateX(110%);
-        }
-
-
-        .controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #1e293b;
-            color: #e2e8f0;
-            border: 1px solid #334155;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
-        }
-
-        .question-carousel {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            min-height: 400px;
-            position: relative;
             overflow: hidden;
-        }
-
-        .carousel-nav {
-            font-size: 2rem;
-            cursor: pointer;
-            padding: 1rem;
-            transition: all 0.3s ease;
-            min-width: 50px;
-            text-align: center;
-            color: #7c3aed;
-            text-shadow: 0 0 10px #7c3aed80;
-            z-index: 99999;
-        }
-
-        .carousel-nav.inactive {
-            color: #475569;
-            cursor: not-allowed;
-            text-shadow: none;
-        }
-        .carousel-nav.active {
-            color: #7c3aed;
-            text-shadow: 0 0 10px #7c3aed80;
-        }
-
-        .questions-wrapper {
-            flex: 1;
-            position: relative;
-            height: 500px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .correct-check {
-            display: none;
-        }
-
-        .question-block {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateX(110%);
-            opacity: 0;
             position: absolute;
-            width: 100%;
-            margin-left: 50px;
-            margin-right: 50px;
-        }
-
-        .question-block.active {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        .question-block.prev {
-            transform: translateX(-110%);
-            opacity: 0.2;
-            filter: blur(2px);
-        }
-        textarea {
-            resize: none !important;
-        }
-
-        .question-block.next {
-            transform: translateX(110%);
-            opacity: 0.2;
-            filter: blur(2px);
-        }
-        .question-block.slide-left {
-            animation: slideOutLeft 0.2s forwards;
-        }
-
-        .question-block.slide-right {
-            animation: slideOutRight 0.2s forwards;
-        }
-
-        @keyframes slideOutLeft {
-            to {
-                transform: translateX(-100%);
-                opacity: 0;
-            }
-        }
-
-        @keyframes slideOutRight {
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .question-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #7c3aed;
-        }
-
-        textarea {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 1rem;
-            color: #e2e8f0;
-            margin-bottom: 1.5rem;
-            resize: vertical;
-            min-height: 100px;
-            transition: all 0.3s ease;
-        }
-
-        textarea:focus {
-            border-color: #7c3aed;
-            box-shadow: 0 0 10px #7c3aed80;
-            outline: none;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .option-item {
-            position: relative;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .option-item:hover {
-            border-color: #7c3aed;
-        }
-
-        .option-item input {
-            width: 100%;
-            background: none;
-            border: none;
-            color: #e2e8f0;
-            padding: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .correct-marker {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background: #10b981;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-        }
-
-        .correct-check:checked + .option-item {
-            border: 2px solid #10b981;
-            box-shadow: 0 0 10px #10b98180;
-        }
-
-        .correct-check:checked + .option-item .correct-marker {
-            display: flex;
-        }
-
-        #questionnaire-title {
-            width: 100%;
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 1rem;
-            font-size: 1.5rem;
-            color: #e2e8f0;
-            margin-bottom: 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        #questionnaire-title:focus {
-            border-color: #7c3aed;
-            box-shadow: 0 0 10px #7c3aed80;
-            outline: none;
-        }
-
-        @keyframes neonPulse {
-            0%, 100% { text-shadow: 0 0 10px #7c3aed80; }
-            50% { text-shadow: 0 0 20px #7c3aed, 0 0 30px #7c3aed80; }
-        }
-
-        .delete-btn {
-            background: #dc2626;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: 1px solid #991b1b;
-            transition: all 0.3s ease;
-        }
-
-        .delete-btn:hover {
-            background: #991b1b;
-            transform: scale(1.05);
+            z-index: -1;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Construtor de Quiz</h1>
-            <input type="text" id="questionnaire-title" placeholder="Nome do Questionário">
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-indigo-400 mb-2">Editor de Questionários - Passa ou Repassa</h1>
+            <p class="text-gray-600">Versão Beta</p>
+        </header>
+
+        <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <div class="flex-1">
+                    <label for="quizTitle" class="block text-sm font-medium text-gray-300 mb-1">Nome do Questionário</label>
+                    <input type="text" id="quizTitle" placeholder="Digite o nome do questionário" 
+                           class="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="flex items-end gap-2">
+                    <button id="importBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md flex items-center gap-2">
+                        <i class="fas fa-file-import"></i> Importar
+                    </button>
+                    <button id="exportBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md flex items-center gap-2">
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                    <input type="file" id="fileInput" class="file-input" accept=".qn">
+                </div>
+            </div>
+
+            <div id="questionsContainer" class="space-y-4">
+                <!-- Questions will be added here -->
+            </div>
+
+            <button id="addQuestionBtn" class="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-md flex items-center justify-center gap-2">
+                <i class="fas fa-plus"></i> Adicionar Pergunta
+            </button>
         </div>
 
-        <div class="controls">
-            <button class="px-4 py-1 rounded-md bg-purple-600/40 border-2 border-purple-700 hover:bg-purple-800 transition-all text-white" onclick="addQuestion()">
-                <i class="fa-solid fa-plus mr-2"></i> Nova Questão
-            </button>
-            <button class="px-4 py-1 rounded-md bg-green-600/40 border-2 border-green-700 hover:bg-green-800 transition-all text-white" onclick="generateQN()">
-                <i class="fa-solid fa-file-export mr-2"></i> Exportar
-            </button>
-            <button class="px-4 py-1 rounded-md bg-blue-600/40 border-2 border-blue-700 hover:bg-blue-800 transition-all text-white" onclick="importQN()">
-                <i class="fa-solid fa-file-import mr-2"></i> Importar
-            </button>
-            <button class="px-4 py-1 rounded-md bg-blue-600/40 border-2 border-blue-700 hover:bg-blue-800 transition-all text-white" onclick="window.location.href = '/'">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
-            </button>
-        </div>
-
-        <div class="question-carousel">
-            <div class="carousel-nav" id="prevBtn" onclick="prevQuestion()"><i class="fa-solid fa-chevron-left"></i></div>
-            <div class="questions-wrapper" id="questions-container"></div>
-            <div class="carousel-nav" id="nextBtn" onclick="nextQuestion()"><i class="fa-solid fa-chevron-right"></i></div>
+        <div class="bg-gray-800 rounded-lg shadow-lg p-6 hidden" id="previewSection">
+            <h2 class="text-xl font-semibold text-indigo-400 mb-4">Pré-visualização do Arquivo .qn</h2>
+            <pre id="filePreview" class="bg-gray-900 p-4 rounded-md overflow-x-auto text-gray-300 text-sm"></pre>
         </div>
     </div>
 
     <script>
-        let questions = [];
-        let currentQuestion = 0;
-        let xx = 0
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizTitle = document.getElementById('quizTitle');
+            const questionsContainer = document.getElementById('questionsContainer');
+            const addQuestionBtn = document.getElementById('addQuestionBtn');
+            const importBtn = document.getElementById('importBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const fileInput = document.getElementById('fileInput');
+            const previewSection = document.getElementById('previewSection');
+            const filePreview = document.getElementById('filePreview');
 
-        // Inicializa com uma questão
-        window.onload = addQuestion;
-
-        function createQuestionBlock() {
-            const block = document.createElement('div');
-            block.className = 'question-block';
-            block.id = "block"+xx
-            block.innerHTML = `
-                <div class="question-header">
-                    <div class="question-title">Questão</div>
-                    <button class="delete-btn" onclick="deleteQuestion(${questions.length})">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-                <textarea placeholder="Digite sua pergunta..." rows="3"></textarea>
-                <div class="options-grid">
-                    ${Array.from({length: 4}, (_, i) => `
-                    <label>
-                        <input type="radio" name="question${questions.length}" class="correct-check" 
-                               onclick="toggleCorrect(this, ${questions.length}, ${i})">
-                        <div class="option-item">
-                            <div class="correct-marker">✓</div>
-                            <input type="text" class="option-input" placeholder="Opção ${i + 1}">
-                        </div>
-                    </label>
-                    `).join('')}
-                </div>
-            `;
-            return block;
-        }
-        function prevQuestion() {
-            if(currentQuestion > 0) {
-                currentQuestion--;
-                updateCarousel();
-            }
-        }
-
-        function nextQuestion() {
-            if(currentQuestion < questions.length - 1) {
-                currentQuestion++;
-                updateCarousel();
-            }
-        }
-
-        // Função updateCarousel corrigida
-        function updateCarousel() {
-            const container = document.querySelectorAll('#questions-container .question-block');
-            if (currentQuestion > container.length) {
-                currentQuestion = container.length;
-            }
-            container.forEach((elmmt, index) => {
-                const block = elmmt;
-                
-                if(index === currentQuestion) {
-                    block.classList.remove('hidden');
-                    block.classList.add('active');
-                    block.classList.remove('prev');
-                    block.classList.remove('next');
-                } else if(index === currentQuestion - 1) {
-                    block.classList.remove('hidden');
-                    block.classList.remove('active');
-                    block.classList.remove('next');
-                    block.classList.add('prev');
-                } else if(index === currentQuestion + 1) {
-                    block.classList.remove('hidden');
-                    block.classList.remove('active');
-                    block.classList.remove('prev');
-                    block.classList.add('next');
-                } else {
-                    block.classList.add('hidden');
-                    block.classList.remove('active');
-                    block.classList.remove('prev');
-                    block.classList.remove('next');
-                }
-                
+            // Initialize SortableJS for drag and drop
+            new Sortable(questionsContainer, {
+                handle: '.drag-handle',
+                animation: 150,
+                ghostClass: 'bg-indigo-900'
             });
 
-            // Atualizar estado das setas
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            prevBtn.classList.toggle('inactive', currentQuestion === 0);
-            nextBtn.classList.toggle('inactive', currentQuestion === container.length - 1);
-        }
-        const qcontainer = document.querySelector('#questions-container');
-        function addQuestion() {
-            const container = document.querySelectorAll('#questions-container .question-block');
-            xx++
-            const newQuestion = {
-                element: createQuestionBlock(),
-                data: {
-                    question: '',
-                    options: Array(4).fill(''),
-                    correct: -1
+            // Add new question
+            addQuestionBtn.addEventListener('click', function() {
+                addNewQuestion();
+            });
+
+            // Import .qn file
+            importBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        parseQNFile(e.target.result);
+                    };
+                    reader.readAsText(file);
                 }
-            };
-            qcontainer.appendChild(newQuestion.element)
-            questions.push(newQuestion);
-            currentQuestion = container.length;
-            updateCarousel();
-        }
+            });
 
-        function deleteQuestion(index) {
-            const qst =  document.querySelector("#block" + (parseInt(index)+1))
-            questions.splice(index, 1);
-            
-            if(qst.classList.contains('active')) {
-                currentQuestion = Math.min(currentQuestion, questions.length - 1);
-            }
-            
-            qst.remove()
-            
-            updateCarousel();
-        }
+            // Export .qn file
+            exportBtn.addEventListener('click', function() {
+                exportQNFile();
+            });
 
-        function toggleCorrect(radio, questionIndex, optionIndex) {
-            questions[questionIndex].data.correct = optionIndex;
-            const options = radio.closest('.options-grid').querySelectorAll('.correct-check');
-            options.forEach(opt => opt.checked = false);
-            radio.checked = true;
-        }
+            function addNewQuestion(questionData) {
+                const questionId = Date.now();
+                const questionItem = document.createElement('div');
+                questionItem.className = 'question-item bg-gray-700 rounded-lg p-4 border border-gray-600';
+                questionItem.dataset.id = questionId;
 
-        function generateQN() {
-            const title = document.getElementById('questionnaire-title').value.trim();
-            if(!title) return alert('Digite um título!');
+                questionItem.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="drag-handle pt-3 text-gray-400 hover:text-indigo-400">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Pergunta</label>
+                                <input type="text" class="question-input w-full bg-gray-600 border border-gray-500 rounded-md px-3 py-2 text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                                       placeholder="Digite a pergunta" value="${questionData?.question || ''}">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                ${['a', 'b', 'c', 'd'].map(letter => `
+                                    <div class="option-item ${questionData?.correct === letter ? 'option-correct' : ''}" data-letter="${letter}">
+                                        <div class="flex items-center">
+                                            <button class="correct-btn mr-2 w-6 h-6 flex items-center justify-center rounded-full border ${questionData?.correct === letter ? 'bg-indigo-600 border-indigo-600' : 'bg-gray-600 border-gray-500'}">
+                                                ${questionData?.correct === letter ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
+                                            </button>
+                                            <input type="text" class="option-input w-full bg-gray-600 border border-gray-500 rounded-md px-3 py-2 text-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
+                                                   placeholder="Opção ${letter.toUpperCase()}" value="${questionData?.options?.[letter] || ''}">
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="delete-btn mt-1 text-gray-400 hover:text-red-400">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
 
-            let qnContent = `# ${title}\n`;
-            
-            questions.forEach(question => {
-                const qText = question.element.querySelector('textarea').value.trim();
-                const options = Array.from(question.element.querySelectorAll('.option-input')).map((input, i) => {
-                    return i === question.data.correct ? `*${input.value.trim()}` : input.value.trim();
+                questionsContainer.appendChild(questionItem);
+
+                // Add event listeners for the new question
+                const deleteBtn = questionItem.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', function() {
+                    questionItem.remove();
+                    updatePreview();
                 });
 
-                if(qText && options.every(opt => opt)) {
-                    qnContent += `${qText} % ${options.join(' % ')}\n`;
-                }
-            });
-
-            const blob = new Blob([qnContent], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${title.replace(/[^\w]/g, '_')}.qn`;
-            link.click();
-        }
-
-        function importQN() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.qn';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = e => {
-                    questions = [];
-                    const lines = e.target.result.trim().split('\n');
-                    document.getElementById('questionnaire-title').value = lines[0].slice(2).trim();
-                    
-                    lines.slice(1).forEach(line => {
-                        addQuestion();
-                        const question = questions[questions.length - 1];
-                        const parts = line.split('%').map(p => p.trim());
+                const correctBtns = questionItem.querySelectorAll('.correct-btn');
+                correctBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const optionItem = btn.closest('.option-item');
+                        const letter = optionItem.dataset.letter;
                         
-                        question.element.querySelector('textarea').value = parts[0];
-                        parts.slice(1).forEach((opt, i) => {
-                            const input = question.element.querySelectorAll('.option-input')[i];
-                            const isCorrect = opt.startsWith('*');
-                            
-                            input.value = isCorrect ? opt.slice(1) : opt;
-                            if(isCorrect) {
-                                question.data.correct = i;
-                                question.element.querySelectorAll('.correct-check')[i].checked = true;
-                            }
+                        // Remove all correct marks first
+                        questionItem.querySelectorAll('.option-item').forEach(item => {
+                            item.classList.remove('option-correct');
+                            const btn = item.querySelector('.correct-btn');
+                            btn.className = 'correct-btn mr-2 w-6 h-6 flex items-center justify-center rounded-full border bg-gray-600 border-gray-500';
+                            btn.innerHTML = '';
                         });
+
+                        // Mark the selected one as correct
+                        optionItem.classList.add('option-correct');
+                        btn.className = 'correct-btn mr-2 w-6 h-6 flex items-center justify-center rounded-full border bg-indigo-600 border-indigo-600';
+                        btn.innerHTML = '<i class="fas fa-check text-white text-xs"></i>';
+                        
+                        updatePreview();
                     });
-                    currentQuestion = 0;
-                    updateCarousel();
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
+                });
+
+                // Update preview when inputs change
+                const inputs = questionItem.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.addEventListener('input', updatePreview);
+                });
+
+                updatePreview();
+            }
+
+            function parseQNFile(content) {
+                try {
+                    const lines = content.split('\n').filter(line => line.trim() !== '');
+                    
+                    if (lines.length === 0) return;
+                    
+                    // First line is the quiz title
+                    const titleLine = lines[0];
+                    if (titleLine.startsWith('#')) {
+                        quizTitle.value = titleLine.substring(1).trim();
+                    }
+                    
+                    // Clear existing questions
+                    questionsContainer.innerHTML = '';
+                    
+                    // Parse questions
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i];
+                        if (!line.includes('%')) continue;
+                        
+                        const parts = line.split('%').map(part => part.trim());
+                        if (parts.length < 2) continue;
+                        
+                        const questionText = parts[0];
+                        const options = {};
+                        let correctOption = null;
+                        
+                        for (let j = 1; j < parts.length; j++) {
+                            const optionText = parts[j];
+                            if (optionText.startsWith('*')) {
+                                correctOption = String.fromCharCode(96 + j); // a, b, c, d
+                                options[correctOption] = optionText.substring(1).trim();
+                            } else {
+                                const optionLetter = String.fromCharCode(96 + j); // a, b, c, d
+                                options[optionLetter] = optionText.trim();
+                            }
+                        }
+                        
+                        addNewQuestion({
+                            question: questionText,
+                            options: options,
+                            correct: correctOption
+                        });
+                    }
+                    
+                    previewSection.classList.remove('hidden');
+                    filePreview.textContent = content;
+                } catch (error) {
+                    alert('Erro ao importar o arquivo. Verifique o formato e tente novamente.');
+                    console.error(error);
+                }
+            }
+
+            function exportQNFile() {
+                if (!quizTitle.value.trim()) {
+                    alert('Por favor, insira um nome para o questionário.');
+                    return;
+                }
+                
+                const questions = Array.from(questionsContainer.querySelectorAll('.question-item'));
+                if (questions.length === 0) {
+                    alert('Adicione pelo menos uma pergunta antes de exportar.');
+                    return;
+                }
+                
+                let fileContent = `#${quizTitle.value.trim()}\n`;
+                
+                questions.forEach(question => {
+                    const questionInput = question.querySelector('.question-input');
+                    const questionText = questionInput.value.trim();
+                    
+                    if (!questionText) return;
+                    
+                    let questionLine = `${questionText}`;
+                    const options = question.querySelectorAll('.option-item');
+                    
+                    options.forEach(option => {
+                        const letter = option.dataset.letter;
+                        const input = option.querySelector('.option-input');
+                        const optionText = input.value.trim();
+                        
+                        if (optionText) {
+                            if (option.classList.contains('option-correct')) {
+                                questionLine += ` % *${optionText}`;
+                            } else {
+                                questionLine += ` % ${optionText}`;
+                            }
+                        }
+                    });
+                    
+                    fileContent += `${questionLine}\n`;
+                });
+                
+                // Update preview
+                filePreview.textContent = fileContent;
+                previewSection.classList.remove('hidden');
+                
+                // Create download link
+                const blob = new Blob([fileContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${quizTitle.value.trim().replace(/\s+/g, '_')}.qn`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            function updatePreview() {
+                if (!quizTitle.value.trim() && questionsContainer.children.length === 0) {
+                    previewSection.classList.add('hidden');
+                    return;
+                }
+                
+                let previewContent = `#${quizTitle.value.trim()}\n`;
+                
+                const questions = Array.from(questionsContainer.querySelectorAll('.question-item'));
+                questions.forEach(question => {
+                    const questionInput = question.querySelector('.question-input');
+                    const questionText = questionInput.value.trim();
+                    
+                    if (!questionText) return;
+                    
+                    let questionLine = `${questionText}`;
+                    const options = question.querySelectorAll('.option-item');
+                    
+                    options.forEach(option => {
+                        const letter = option.dataset.letter;
+                        const input = option.querySelector('.option-input');
+                        const optionText = input.value.trim();
+                        
+                        if (optionText) {
+                            if (option.classList.contains('option-correct')) {
+                                questionLine += ` % *${optionText}`;
+                            } else {
+                                questionLine += ` % ${optionText}`;
+                            }
+                        }
+                    });
+                    
+                    previewContent += `${questionLine}\n`;
+                });
+                
+                filePreview.textContent = previewContent;
+                previewSection.classList.remove('hidden');
+            }
+
+            // Add initial question
+            addNewQuestion();
+        });
     </script>
 </body>
 </html>
